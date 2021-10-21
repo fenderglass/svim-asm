@@ -123,9 +123,9 @@ def pair_haplotypes(partitions, reference, edit_distance_threshold = 10):
         if len(partition) < 2:
             new_clusters = [partition]
         #Ignore very large partitions because they tend to be in difficult regions
-        elif len(partition) > 10:
+        elif len(partition) > 50:
             logging.debug("Ignored partition of size {0} and type {1}: {2}".format(len(partition), partition[0][1].get_key()[0], ",".join(["{0}:{1}".format(sig[1].get_key()[1], sig[1].get_key()[2]) for sig in partition])))
-            continue
+            new_clusters = [[p] for p in partition]
         else:
             distances = []
             for i in range(len(partition)-1):
