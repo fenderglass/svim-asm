@@ -176,6 +176,12 @@ def pair_candidates(sv_candidates1, sv_candidates2, reference, bam, options):
     breakend_candidates2 = [(2, cand) for cand in sv_candidates2 if cand.type == "BND"]
     interspersed_duplication_candidates2 = [(2, cand) for cand in sv_candidates2 if cand.type == "DUP_INT"]
 
+    def _cluster_genotype(gt_id):
+        if options.phased_gt:
+            return "1|0" if gt_id == 1 else "0|1"
+        else:
+            return "0/1"
+
     paired_candidates = []
     #DELETIONS
     logging.info("Pairing {0} deletions...".format(len(deletion_candidates1) + len(deletion_candidates2)))
@@ -184,7 +190,7 @@ def pair_candidates(sv_candidates1, sv_candidates2, reference, bam, options):
     for cluster in clusters:
         if len(cluster) == 1:
             candidate = cluster[0][1]
-            genotype = "1/0" if cluster[0][0] == 1 else "0/1"
+            genotype = _cluster_genotype(cluster[0][0])
             paired_candidates.append(CandidateDeletion(candidate.source_contig, 
                                                        candidate.source_start, 
                                                        candidate.source_end, 
@@ -194,7 +200,7 @@ def pair_candidates(sv_candidates1, sv_candidates2, reference, bam, options):
         elif len(cluster) == 2:
             candidate = cluster[0][1]
             reads = cluster[0][1].reads + cluster[1][1].reads
-            genotype = "1/1"
+            genotype = "1|1" if options.phased_gt else "1/1"
             paired_candidates.append(CandidateDeletion(candidate.source_contig, 
                                                        candidate.source_start, 
                                                        candidate.source_end, 
@@ -211,7 +217,7 @@ def pair_candidates(sv_candidates1, sv_candidates2, reference, bam, options):
     for cluster in clusters:
         if len(cluster) == 1:
             candidate = cluster[0][1]
-            genotype = "1/0" if cluster[0][0] == 1 else "0/1"
+            genotype = _cluster_genotype(cluster[0][0])
             paired_candidates.append(CandidateInversion(candidate.source_contig, 
                                                         candidate.source_start, 
                                                         candidate.source_end, 
@@ -223,7 +229,7 @@ def pair_candidates(sv_candidates1, sv_candidates2, reference, bam, options):
             candidate = cluster[0][1]
             complete = cluster[0][1].complete or cluster[1][1].complete
             reads = cluster[0][1].reads + cluster[1][1].reads
-            genotype = "1/1"
+            genotype = "1|1" if options.phased_gt else "1/1"
             paired_candidates.append(CandidateInversion(candidate.source_contig, 
                                                         candidate.source_start, 
                                                         candidate.source_end, 
@@ -241,7 +247,7 @@ def pair_candidates(sv_candidates1, sv_candidates2, reference, bam, options):
     for cluster in clusters:
         if len(cluster) == 1:
             candidate = cluster[0][1]
-            genotype = "1/0" if cluster[0][0] == 1 else "0/1"
+            genotype = _cluster_genotype(cluster[0][0])
             paired_candidates.append(CandidateInsertion(candidate.dest_contig, 
                                                         candidate.dest_start, 
                                                         candidate.dest_end, 
@@ -252,7 +258,7 @@ def pair_candidates(sv_candidates1, sv_candidates2, reference, bam, options):
         elif len(cluster) == 2:
             candidate = cluster[0][1]
             reads = cluster[0][1].reads + cluster[1][1].reads
-            genotype = "1/1"
+            genotype = "1|1" if options.phased_gt else "1/1"
             paired_candidates.append(CandidateInsertion(candidate.dest_contig, 
                                                         candidate.dest_start, 
                                                         candidate.dest_end, 
@@ -270,7 +276,7 @@ def pair_candidates(sv_candidates1, sv_candidates2, reference, bam, options):
     for cluster in clusters:
         if len(cluster) == 1:
             candidate = cluster[0][1]
-            genotype = "1/0" if cluster[0][0] == 1 else "0/1"
+            genotype = _cluster_genotype(cluster[0][0])
             paired_candidates.append(CandidateDuplicationTandem(candidate.source_contig, 
                                                                 candidate.source_start, 
                                                                 candidate.source_end, 
@@ -283,7 +289,7 @@ def pair_candidates(sv_candidates1, sv_candidates2, reference, bam, options):
             candidate = cluster[0][1]
             fully_covered = cluster[0][1].fully_covered or cluster[1][1].fully_covered
             reads = cluster[0][1].reads + cluster[1][1].reads
-            genotype = "1/1"
+            genotype = "1|1" if options.phased_gt else "1/1"
             paired_candidates.append(CandidateDuplicationTandem(candidate.source_contig, 
                                                                 candidate.source_start, 
                                                                 candidate.source_end, 
@@ -302,7 +308,7 @@ def pair_candidates(sv_candidates1, sv_candidates2, reference, bam, options):
     for cluster in clusters:
         if len(cluster) == 1:
             candidate = cluster[0][1]
-            genotype = "1/0" if cluster[0][0] == 1 else "0/1"
+            genotype = _cluster_genotype(cluster[0][0])
             paired_candidates.append(CandidateDuplicationInterspersed(candidate.source_contig, 
                                                                       candidate.source_start, 
                                                                       candidate.source_end, 
@@ -317,7 +323,7 @@ def pair_candidates(sv_candidates1, sv_candidates2, reference, bam, options):
             candidate = cluster[0][1]
             reads = cluster[0][1].reads + cluster[1][1].reads
             cutpaste = cluster[0][1].cutpaste or cluster[1][1].cutpaste
-            genotype = "1/1"
+            genotype = "1|1" if options.phased_gt else "1/1"
             paired_candidates.append(CandidateDuplicationInterspersed(candidate.source_contig, 
                                                                       candidate.source_start, 
                                                                       candidate.source_end, 
@@ -338,7 +344,7 @@ def pair_candidates(sv_candidates1, sv_candidates2, reference, bam, options):
     for cluster in clusters:
         if len(cluster) == 1:
             candidate = cluster[0][1]
-            genotype = "1/0" if cluster[0][0] == 1 else "0/1"
+            genotype = _cluster_genotype(cluster[0][0])
             paired_candidates.append(CandidateBreakend(candidate.source_contig, 
                                                         candidate.source_start, 
                                                         candidate.source_direction, 
@@ -351,7 +357,7 @@ def pair_candidates(sv_candidates1, sv_candidates2, reference, bam, options):
         elif len(cluster) == 2:
             candidate = cluster[0][1]
             reads = cluster[0][1].reads + cluster[1][1].reads
-            genotype = "1/1"
+            genotype = "1|1" if options.phased_gt else "1/1"
             paired_candidates.append(CandidateBreakend(candidate.source_contig, 
                                                         candidate.source_start, 
                                                         candidate.source_direction, 
