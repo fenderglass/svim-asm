@@ -99,7 +99,8 @@ def compute_distance(candidate_with_haplotype1, candidate_with_haplotype2, refer
                      reference.fetch(region_chr, candidate2.dest_start, region_end).upper()
         editDistance = align(haplotype1, haplotype2)["editDistance"]
 
-    return editDistance
+    relativeDistance = float(editDistance) / max(len(haplotype1), len(haplotype2))
+    return relativeDistance
 
 
 def span_position_distance_breakends(candidate1, candidate2):

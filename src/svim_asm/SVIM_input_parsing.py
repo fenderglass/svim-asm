@@ -229,9 +229,9 @@ SVIM-asm has an haploid and a diploid mode depending on the input assembly and p
                                               If the distance between two subsequent signatures \
                                               is larger than this parameter, they are distributed into separate partitions.')
     group_diploid_pair.add_argument('--max_edit_distance',
-                                        type=int,
-                                        default=200,
-                                        help='Maximum edit distance between both alleles to be paired up into a homozygous call (default: %(default)s).')
+                                        type=float,
+                                        default=0.3,
+                                        help='Maximum relative edit distance between both alleles to be paired up into a homozygous call (default: %(default)s).')
 
     group_diploid_output = parser_diploid.add_argument_group('OUTPUT')
     group_diploid_output.add_argument('--sample',
