@@ -62,6 +62,7 @@ def retrieve_other_alignments(main_alignment, bam):
 
 
 def filter_contained_alignments(alignments):
+    CONTEINMENT_RATE = 0.9
     aln_intervals = defaultdict(list)
     for aln in alignments:
         ref_id, ref_start, ref_end = aln.reference_name, aln.reference_start, aln.reference_end
@@ -79,7 +80,8 @@ def filter_contained_alignments(alignments):
 
         contained = False
         for other_aln in aln_intervals[ref_id]:
-            if ref_start > other_aln[0] and ref_end < other_aln[1]:
+            overlap = min(other_aln[1], ref_end) - max(other_aln[0], ref_start)
+            if overlap > CONTAINMENT_RATE * (ref_end - ref_start) and (other_aln[1] - other_aln[0]) > (ref_end - ref_start):
                 contained = True
                 break
 
