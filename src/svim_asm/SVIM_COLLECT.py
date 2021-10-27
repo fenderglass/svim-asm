@@ -62,7 +62,7 @@ def retrieve_other_alignments(main_alignment, bam):
 
 
 def filter_contained_alignments(alignments):
-    CONTEINMENT_RATE = 0.9
+    CONTAINMENT_RATE = 0.9
     aln_intervals = defaultdict(list)
     for aln in alignments:
         ref_id, ref_start, ref_end = aln.reference_name, aln.reference_start, aln.reference_end
