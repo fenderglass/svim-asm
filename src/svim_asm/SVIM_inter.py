@@ -64,13 +64,17 @@ def analyze_read_segments(primary, supplementaries, bam, options):
     alignments = [primary] + supplementaries
     alignment_list = []
     for alignment in alignments:
+        hard_clip_left = 0
+        if alignment.cigartuples[0][0] == 5:
+            hard_clip_left = alignment.cigartuples[0][1]
+
         #correct query coordinates for reversely mapped reads
         if alignment.is_reverse:
-            q_start = alignment.infer_read_length() - alignment.query_alignment_end
-            q_end = alignment.infer_read_length() - alignment.query_alignment_start
+            q_start = alignment.infer_read_length() - (alignment.query_alignment_end + hard_clip_left)
+            q_end = alignment.infer_read_length() - (alignment.query_alignment_start + hard_clip_left)
         else:
-            q_start = alignment.query_alignment_start
-            q_end = alignment.query_alignment_end
+            q_start = alignment.query_alignment_start + hard_clip_left
+            q_end = alignment.query_alignment_end + hard_clip_left
 
         new_alignment_dict = {  'q_start': q_start, 
                                 'q_end': q_end, 
