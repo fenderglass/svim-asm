@@ -41,6 +41,8 @@ SVIM-asm has an haploid and a diploid mode depending on the input assembly and p
                               help='Enable more verbose logging (default: %(default)s)')
     parser_haploid.add_argument('--phased_gt', default=False, action='store_true',
                                 help='Use phased gentype notation in vcf (default: %(default)s)')
+    parser_haploid.add_argument('--filter_contained', default=False, action='store_true',
+                                help='Filter contained alignments to limit false positive calls (default: %(default)s)')
     group_haploid_collect = parser_haploid.add_argument_group('COLLECT')
     group_haploid_collect.add_argument('--min_mapq',
                                       type=int,
@@ -157,6 +159,8 @@ SVIM-asm has an haploid and a diploid mode depending on the input assembly and p
                               help='Enable more verbose logging (default: %(default)s)')
     parser_diploid.add_argument('--phased_gt', default=False, action='store_true',
                                 help='Use phased gentype notation in vcf (default: %(default)s)')
+    parser_diploid.add_argument('--filter_contained', default=False, action='store_true',
+                                help='Filter contained alignments to limit false positive calls (default: %(default)s)')
     group_diploid_collect = parser_diploid.add_argument_group('COLLECT')
     group_diploid_collect.add_argument('--min_mapq',
                                       type=int,

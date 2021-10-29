@@ -98,7 +98,8 @@ def analyze_alignment_file_coordsorted(bam, options):
             continue
         all_alignments.append(aln)
 
-    all_alignments = filter_contained_alignments(all_alignments)
+    if options.filter_contained:
+        all_alignments = filter_contained_alignments(all_alignments)
 
     supplementary_aln_by_read = defaultdict(list)
     for aln in all_alignments:
