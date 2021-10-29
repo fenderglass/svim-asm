@@ -20,9 +20,9 @@ from svim_asm.SVIM_COMBINE import pair_candidates, write_final_vcf
 from svim_asm.SVIM_plot import plot_sv_lengths
 
 
-def main():
+def main(svim_arguments):
     # Fetch command-line options
-    options = parse_arguments(program_version=__version__)
+    options = parse_arguments(program_version=__version__, arguments=svim_arguments)
 
     if not options.sub:
         print("Please choose one of the two modes ('haploid' or 'diploid'). See --help for more information.")
@@ -50,7 +50,7 @@ def main():
     rootLogger.addHandler(consoleHandler)
 
     logging.info("****************** Start SVIM-asm, version {0} ******************".format(__version__))
-    logging.info("CMD: python3 {0}".format(" ".join(sys.argv)))
+    logging.info("CMD: python3 {0}".format(" ".join(svim_arguments)))
     logging.info("WORKING DIR: {0}".format(os.path.abspath(options.working_dir)))
     for arg in vars(options):
         logging.info("PARAMETER: {0}, VALUE: {1}".format(arg, getattr(options, arg)))
@@ -180,6 +180,6 @@ def main():
 
 if __name__ == "__main__":
     try:
-        sys.exit(main())
+        sys.exit(main(svim_arguments=sys.argv[1:]))
     except Exception as e:
         logging.error(e, exc_info=True)
