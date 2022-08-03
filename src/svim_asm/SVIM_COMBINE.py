@@ -41,12 +41,15 @@ def compute_distance(candidate_with_haplotype1, candidate_with_haplotype2, refer
         return 1000000000
 
     if candidate1.type == "DEL":
-        region_chr = candidate1.source_contig
-        chr_length = reference.get_reference_length(region_chr)
-        region_start = max(0, min(candidate1.source_start, candidate2.source_start) - 100)
-        region_end = min(chr_length, max(candidate1.source_end, candidate2.source_end) + 100)
-        haplotype1 = reference.fetch(region_chr, region_start, candidate1.source_start).upper() + reference.fetch(region_chr, candidate1.source_end, region_end).upper()
-        haplotype2 = reference.fetch(region_chr, region_start, candidate2.source_start).upper() + reference.fetch(region_chr, candidate2.source_end, region_end).upper()
+        #region_chr = candidate1.source_contig
+        #chr_length = reference.get_reference_length(region_chr)
+        #region_start = max(0, min(candidate1.source_start, candidate2.source_start) - 100)
+        #region_end = min(chr_length, max(candidate1.source_end, candidate2.source_end) + 100)
+        #haplotype1 = reference.fetch(region_chr, region_start, candidate1.source_start).upper() + reference.fetch(region_chr, candidate1.source_end, region_end).upper()
+        #haplotype2 = reference.fetch(region_chr, region_start, candidate2.source_start).upper() + reference.fetch(region_chr, candidate2.source_end, region_end).upper()
+        haplotype1 = reference.fetch(candidate1.source_contig, candidate1.source_start, candidate1.source_end).upper()
+        haplotype2 = reference.fetch(candidate2.source_contig, candidate2.source_start, candidate2.source_end).upper()
+        #print("DEL", haplotype1, haplotype2)
         editDistance = align(haplotype1, haplotype2)["editDistance"]
     elif candidate1.type == "INV":
         region_chr = candidate1.source_contig
@@ -63,16 +66,19 @@ def compute_distance(candidate_with_haplotype1, candidate_with_haplotype2, refer
                      reference.fetch(region_chr, candidate2.source_end, region_end).upper()
         editDistance = align(haplotype1, haplotype2)["editDistance"]
     elif candidate1.type == "INS":
-        region_chr = candidate1.dest_contig
-        chr_length = reference.get_reference_length(region_chr)
-        region_start = max(0, min(candidate1.dest_start, candidate2.dest_start) - 100)
-        region_end = min(chr_length, max(candidate1.dest_start, candidate2.dest_start) + 100)
-        haplotype1 = reference.fetch(region_chr, region_start, candidate1.dest_start).upper() + \
-                     candidate1.sequence + \
-                     reference.fetch(region_chr, candidate1.dest_start, region_end).upper()
-        haplotype2 = reference.fetch(region_chr, region_start, candidate2.dest_start).upper() + \
-                     candidate2.sequence + \
-                     reference.fetch(region_chr, candidate2.dest_start, region_end).upper()
+        #region_chr = candidate1.dest_contig
+        #chr_length = reference.get_reference_length(region_chr)
+        #region_start = max(0, min(candidate1.dest_start, candidate2.dest_start) - 100)
+        #region_end = min(chr_length, max(candidate1.dest_start, candidate2.dest_start) + 100)
+        #haplotype1 = reference.fetch(region_chr, region_start, candidate1.dest_start).upper() + \
+        #             candidate1.sequence + \
+        #             reference.fetch(region_chr, candidate1.dest_start, region_end).upper()
+        #haplotype2 = reference.fetch(region_chr, region_start, candidate2.dest_start).upper() + \
+        #             candidate2.sequence + \
+        #             reference.fetch(region_chr, candidate2.dest_start, region_end).upper()
+        haplotype1 = candidate1.sequence
+        haplotype2 = candidate2.sequence
+        #print("INS", haplotype1, haplotype2)
         editDistance = align(haplotype1, haplotype2)["editDistance"]
     elif candidate1.type == "DUP_TAN":
         region_chr = candidate1.source_contig
@@ -199,7 +205,12 @@ def pair_candidates(sv_candidates1, sv_candidates2, reference, bam, options):
                                                        bam,
                                                        genotype))
         elif len(cluster) == 2:
-            candidate = cluster[0][1]
+            #chosing longer SVs from two haplotypes
+            if cluster[0][1].source_end - cluster[0][1].source_end >= cluster[1][1].source_end - cluster[1][1].source_end:
+                candidate = cluster[0][1]
+            else:
+                candidate = cluster[1][1]
+
             reads = cluster[0][1].reads + cluster[1][1].reads
             genotype = "1|1" if options.phased_gt else "1/1"
             paired_candidates.append(CandidateDeletion(candidate.source_contig, 
@@ -257,7 +268,13 @@ def pair_candidates(sv_candidates1, sv_candidates2, reference, bam, options):
                                                         bam, 
                                                         genotype))
         elif len(cluster) == 2:
-            candidate = cluster[0][1]
+            #candidate = cluster[0][1]
+            #chosing longer SVs from two haplotypes
+            if len(cluster[0][1].sequence) >= len(cluster[1][1].sequence):
+                candidate = cluster[0][1]
+            else:
+                candidate = cluster[1][1]
+
             reads = cluster[0][1].reads + cluster[1][1].reads
             genotype = "1|1" if options.phased_gt else "1/1"
             paired_candidates.append(CandidateInsertion(candidate.dest_contig, 

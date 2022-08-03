@@ -91,7 +91,21 @@ def filter_contained_alignments(alignments):
     return filtered_alignments
 
 
+def parse_tandem_bed(filename):
+    tandem_by_chr = defaultdict(list)
+    for line in open(filename, "r"):
+        if line.startswith("#"):
+            continue
+        fields = line.strip().split()
+        tandem_by_chr[fields[0]].append((int(fields[1]), int(fields[2])))
+    return tandem_by_chr
+
+
 def analyze_alignment_file_coordsorted(bam, options):
+    tandem_annotations = None
+    if options.tandem:
+        tandem_annotations = parse_tandem_bed(options.tandem)
+
     all_alignments = []
     for aln in bam.fetch():
         if aln.is_unmapped or aln.is_secondary or aln.mapping_quality < options.min_mapq:
@@ -108,7 +122,8 @@ def analyze_alignment_file_coordsorted(bam, options):
 
     sv_candidates = []
     for current_alignment in all_alignments:
-        sv_candidates.extend(analyze_alignment_indel(current_alignment, bam, current_alignment.query_name, options))
+        sv_candidates.extend(analyze_alignment_indel(current_alignment, bam, current_alignment.query_name,
+                                                     options, tandem_annotations))
         if not current_alignment.is_supplementary:
             good_suppl_alns = supplementary_aln_by_read[current_alignment.query_name]
             #_supplementary_alignments = retrieve_other_alignments(current_alignment, bam)
