@@ -61,6 +61,7 @@ def main(svim_arguments):
         logging.info("MODE: haploid")
         logging.info("INPUT: {0}".format(os.path.abspath(options.bam_file)))
         aln_file1 = pysam.AlignmentFile(options.bam_file)
+        bed_file1 = os.path.join(options.working_dir, "aln_coverage_1.bed")
         try:
             if aln_file1.header["HD"]["SO"] == "coordinate":
                 try:
@@ -71,7 +72,7 @@ def main(svim_arguments):
                 except AttributeError:
                     logging.error("pysam's .check_index raised an Attribute error. Something is wrong with the input BAM file. Exiting..")
                     return
-                sv_candidates = analyze_alignment_file_coordsorted(aln_file1, options)
+                sv_candidates = analyze_alignment_file_coordsorted(aln_file1, options, bed_file1)
             else:
                 logging.error("Input BAM file needs to be coordinate-sorted. Exiting..")
                 return
@@ -82,8 +83,13 @@ def main(svim_arguments):
         logging.info("MODE: diploid")
         logging.info("INPUT1: {0}".format(os.path.abspath(options.bam_file1)))
         logging.info("INPUT2: {0}".format(os.path.abspath(options.bam_file2)))
+
         aln_file1 = pysam.AlignmentFile(options.bam_file1)
         aln_file2 = pysam.AlignmentFile(options.bam_file2)
+
+        bed_file1 = os.path.join(options.working_dir, "aln_coverage_pat.bed")
+        bed_file2 = os.path.join(options.working_dir, "aln_coverage_mat.bed")
+
         try:
             if aln_file1.header["HD"]["SO"] == "coordinate":
                 try:
@@ -94,7 +100,7 @@ def main(svim_arguments):
                 except AttributeError:
                     logging.error("pysam's .check_index raised an Attribute error. Something is wrong with the first input BAM file. Exiting..")
                     return
-                sv_candidates1 = analyze_alignment_file_coordsorted(aln_file1, options)    
+                sv_candidates1 = analyze_alignment_file_coordsorted(aln_file1, options, bed_file1)    
             else:
                 logging.error("The first input BAM file needs to be coordinate-sorted. Exiting..")
                 return
@@ -111,7 +117,7 @@ def main(svim_arguments):
                 except AttributeError:
                     logging.error("pysam's .check_index raised an Attribute error. Something is wrong with the second input BAM file. Exiting..")
                     return
-                sv_candidates2 = analyze_alignment_file_coordsorted(aln_file2, options)
+                sv_candidates2 = analyze_alignment_file_coordsorted(aln_file2, options, bed_file2)
             else:
                 logging.error("The second input BAM file needs to be coordinate-sorted. Exiting..")
                 return

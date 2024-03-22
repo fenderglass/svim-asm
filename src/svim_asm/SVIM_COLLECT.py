@@ -101,7 +101,7 @@ def parse_tandem_bed(filename):
     return tandem_by_chr
 
 
-def analyze_alignment_file_coordsorted(bam, options):
+def analyze_alignment_file_coordsorted(bam, options, bed_file):
     tandem_annotations = None
     if options.tandem:
         tandem_annotations = parse_tandem_bed(options.tandem)
@@ -114,6 +114,11 @@ def analyze_alignment_file_coordsorted(bam, options):
 
     if options.filter_contained:
         all_alignments = filter_contained_alignments(all_alignments)
+
+    with open(bed_file, "w") as f:
+        for aln in all_alignments:
+            f.write("{0}\t{1}\t{2}\t{3}\n".format(aln.reference_name, aln.reference_start,
+                                                  aln.reference_end, aln.query_name))
 
     supplementary_aln_by_read = defaultdict(list)
     for aln in all_alignments:
